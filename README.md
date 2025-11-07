@@ -9,7 +9,7 @@ This lab demonstrates a **practical application of the Medallion Architecture**,
 
 This part involves curating the Goodreads data using Parquet files from the processed folder, which was created via the Azure Data Factory pipeline from the raw data. The necessary columns were stored in the variable reviews_clean. Columns from the books, authors, and reviews_clean datasets were examined, and a bridge table book_authors was created to link books and authors. The datasets books, authors, book_authors, and reviews_clean were joined into a single curated DataFrame and saved to gold_path. The DataFrame was then converted into a Delta table and stored as a single table named curated_reviews inside the gold folder of the lakehouse, making it available for SQL queries. The table was verified using a simple SQL query. The implementation can be reviewed in the Notebooks folder: **`Notebooks/01_Curate_Gold_Table.ipynb`**.
 
-### Part 2 – Fabric Data Cleaning and Aggregation
+### Part 2 – Data Cleaning and Aggregation: Using Microsoft Fabrics
 
 This part involves four main tables:
 1. Source Table (Query): Cleaning steps of the gold table curated_reviews from Part 1.
@@ -87,3 +87,6 @@ Output
 
 All M (Power Query) code for this Fabric data pipeline has been provided in the folder: **`SQL_Script/02_Fabrics_SqlSteps.m`**
 
+### Part 3 – Data Cleaning and Aggregation: Using DataBricks from Azure
+
+Since the Fabric pipeline could not be published, the same cleaning and transformation steps were performed in Databricks. This involved inspecting and correcting column data types, converting the date_added column to ISO format (date_added_iso), and removing invalid or null rows. Duplicates were removed, and text columns were normalized by lowering review_text, removing malformed characters, capitalizing each word in title and name for potential NER tasks, and trimming leading/trailing spaces. Reviews with very short content were filtered using a review_length column, and future or invalid dates were removed.And,Aggregated features were created (avg_book_rating, num_reviews_per_book, author_avg_rating, min/max/avg_review_words). Additionally helper columns like review_length, date_added and review_word_count were removed. Finally, the cleaned and enriched dataset was saved to the gold folder as `gold.features_v1` for further analysis.
