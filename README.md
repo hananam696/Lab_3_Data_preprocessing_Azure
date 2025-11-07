@@ -19,6 +19,7 @@ This part involves four main tables:
 5. Final Merged Table (cleaned_dataset): Combines all the above tables using left outer into one cleaned dataset and did final cleaning steps.
 
 **1- Source table steps (Query)**
+
 Key Operations
 - Load data from Azure Delta Lake (curated_reviews)
 - Parse and convert date_added to ISO format (YYYY-MM-DD)
@@ -37,6 +38,7 @@ Output
 - Columns: 13 (review_id, book_id, title, author_id, name, user_id, rating, review_text, language_code, n_votes, date_added, date_added_iso,review_length)
 
 **2- Groupby table: Book Summary Table (agg_book_summary)**
+
 Key Operations
 - Group reviews by book_id
 - Calculate average rating per book from all user ratings
@@ -49,6 +51,7 @@ Output
 - Columns: 3 (book_id, avg_rating, num_reviews)
 
 **3 - Groupby Table: Author summary Table**
+
 Key Operations
 - Group reviews by author name
 - Calculate average rating received by author across all their books
@@ -57,6 +60,7 @@ Output
 - Columns: 2 (name, avg_author_rating)
 
 **4 - Groupby Table: Count Book review statistics (book_review_stats)**
+
 Key Operations
 - Add new column: review_word_count (To count the number of review words)
 - Group statistics by book_id
@@ -68,6 +72,7 @@ Output
 - Columns: 4 (book_id, avg_review_words, min_review_words, max_review_words)
 
 **5 - Final Merged and cleaned Table**
+
 Key Operations
 - Joined the main Query with Book Summary (agg_book_summary) using book_id as the key
 - Expanded aggregated columns: avg_rating, num_reviews
