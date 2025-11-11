@@ -44,3 +44,6 @@ The same Sentence-BERT model was used to the full dataset. Also , here PCA wasn'
 4. Combined Feature Set and Output
 
 After extracting new features, basic text features such as review_length_words and review_length_chars, sentiment score features like (sentiment_pos, sentiment_neg, sentiment_neu, sentiment_compound), and semantic embeddings from Sentence-BERT (sbert_features) and TF-IDF vectors (tfidf_features) were merged with metadata columns (review_id, book_id, rating) to create a complete feature matrix. The final dataset was saved to the Gold layer in a new folder named features_v3 as a Delta table using overwrite mode, ensuring no schema conflicts and making it ready for downstream predictive modeling.
+
+
+**Reference Code:** See the implementation in **`Notebooks/01_goodreads_feature_extraction.ipynb`**
