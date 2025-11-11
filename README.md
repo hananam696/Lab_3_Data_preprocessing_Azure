@@ -18,3 +18,6 @@ Before doing more feature extraction, made sure the review_text column is cleane
 3. Feature Extraction
 -  Sentiment feature:
  VADER library was used to extract sentiment components from the review text. For each review, extracted four scores: positive, negative, neutral, and compound which returned a scores Since the dataset is large,  pandas with PySpark UDFs was used to efficiently process all reviews in parallel. These sentiment features were then added as separate columns to the dataset for modeling.
+
+- Sentence-Bert:
+Sentence-BERT (model name: all-MiniLM-L6-v2)was used  for Semantic Embedding Features because it is fast and efficient. It vectorized the entire review into a 384-dimensional dense embedding capturing rich semantic relationships beyond simple word counts or TF-IDF. Since the dataset was large, Principal Component Analysis (PCA) was applied to reduce the embedding dimensionality (from 384 to 128) for improved computational efficiency and noise reduction. Additionally, the code was run on batches  to handle large-scale data efficiently.
