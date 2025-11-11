@@ -17,12 +17,19 @@ Before doing more feature extraction, made sure the review_text column is cleane
 
 3. Feature Extraction
 -  Sentiment feature:
-**On full data**
+**On full Data**
 The VADER library was used to extract sentiment components from the review text on the full dataset. For each review, four scores were extracted: positive, negative, neutral, and compound. Since the dataset is large, Pandas UDFs with PySpark were used to efficiently process all reviews in parallel. These sentiment features were then added as separate columns to the dataset for use in feature extraction.
 
+- TF-IDF:
+**On Sample Data** - for testing
+A scikit-learn TfidfVectorizer was used to get TF-IDF features from the reviews. A sample of 100,000 reviews was used to fit the vectorizer. It considered the top 500 words, removed common English stop words, and included both single words and word pairs. Pandas UDFs were then used to calculate summary features (tfidf_mean, tfidf_max, tfidf_min) for each review. These features were added as separate columns to the dataset.
+
+**On Full Data**
+For the full dataset, PySpark ML was used to compute TF-IDF features. Reviews were split into words, converted to term frequencies, and then transformed into TF-IDF vectors. These vectors were stored in a column called tfidf_features and added back to the DataFrame. Spark’s distributed processing made it possible to handle the entire dataset efficiently.
+
 - Sentence-Bert:
-**On sample data** - for testing
+**On Sample Data** - for testing
 Sentence-BERT (model name: all-MiniLM-L6-v2)was used  for Semantic Embedding Features because it is fast and efficient. It vectorized the entire review into a 384-dimensional dense embedding capturing rich semantic relationships beyond simple word counts or TF-IDF. Since the dataset was large, Principal Component Analysis (PCA) was applied to reduce the embedding dimensionality (from 384 to 128) for improved computational efficiency and noise reduction. Additionally, the code was run on batches  to handle large-scale data efficiently.
 
-**On full data**
+**On Full Data**
 The same Sentence-BERT model was used to the full dataset. Also , here PCA wasn't used to reduce the size of embeddings. However, to handle the large dataset, the reviews were processed in batches using Spark’s Pandas UDF feature, which allowed to efficiently create embeddings without running out of memory.
