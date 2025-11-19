@@ -26,7 +26,7 @@ Basic text features were created to capture the length of each review. review_le
 
 -  Sentiment feature:
 
-The VADER library was used to extract sentiment components from the review text on the full dataset. For each review, four scores were extracted: positive, negative, neutral, and compound. Since the dataset is large, Pandas UDFs with PySpark were used to efficiently process all reviews in parallel. These sentiment features were then added as separate columns to the dataset for use in feature extraction.
+The VADER library was used to extract sentiment scores from the review text for the full dataset. For each review, four scores were calculated: positive, negative, neutral, and compound. Empty or invalid reviews were assigned a score of 0.0 for safety, although empty rows had already been handled during data cleaning. Spark UDFs were used to efficiently compute the scores for all reviews in parallel. These sentiment features capture the emotional tone of each review and were added as separate columns to the dataset. The resulting sentiment DataFrame (sentiment_train) was saved as a Delta table
 
 - TF-IDF:
 
@@ -39,9 +39,10 @@ A readability score was added to the dataset to show how easy each review is to 
 - Sentence-Bert:
 
 Semantic embeddings were created for the full dataset to capture the meaning of each review. This was done using the SentenceTransformer model (all-MiniLM-L6-v2), which converts text into dense numerical vectors that represent the semantic relationships between words and sentences. A Spark UDF was applied to generate an embedding for each review. Empty or invalid text entries were skipped for safety, even though the text had already been cleaned earlier. These embeddings help identify how similar or different reviews are in terms of meaning, allowing models to understand context more effectively. The resulting semantic embedding DataFrame (embedded_train) was saved as a Delta table.
+
 4. Combined Feature Set and Output
 
-After extracting new features, basic text features such as review_length_words and review_length_chars, sentiment score features like (sentiment_pos, sentiment_neg, sentiment_neu, sentiment_compound), and semantic embeddings from Sentence-BERT (sbert_features) and TF-IDF vectors (tfidf_features) were merged with metadata columns (review_id, book_id, rating) to create a complete feature matrix. The final dataset was saved to the Gold layer in a new folder named features_v3 as a Delta table using overwrite mode, ensuring no schema conflicts and making it ready for downstream predictive modeling.
+All the extracted features, including sentiment scores, TF‑IDF vectors, readability scores, and semantic embeddings from SBERT, were first saved as separate Delta tables. In the final step, these features were consolidated by loading the embedded_train table, which already contained all processed training features. The complete set of features was then saved as a single Delta table called combined_train. This merged dataset was verified and stored in the Gold layer at feature_v2/combined_train, making it ready for modeling.
 
 
-**Reference Code:** See the implementation in **`jupyter_notebook/01_goodreads_feature_extraction.ipynb`**
+**Reference Code:** See the implementation in **`jupyter_notebook/02_goodreads_feature_extraction.ipynb`**
