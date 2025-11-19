@@ -21,31 +21,24 @@ Before doing more feature extraction, made sure the review_text column is cleane
 3. Feature Extraction
 
 - Basic Text Features:
+
 Basic text features were created to capture the length of each review. review_length_words counts the total number of words in a review, while review_length_chars counts the total number of characters. These features provide simple numerical information about the text
 
 -  Sentiment feature:
-- **On full Data**
 
 The VADER library was used to extract sentiment components from the review text on the full dataset. For each review, four scores were extracted: positive, negative, neutral, and compound. Since the dataset is large, Pandas UDFs with PySpark were used to efficiently process all reviews in parallel. These sentiment features were then added as separate columns to the dataset for use in feature extraction.
 
 - TF-IDF:
-- **On Sample Data** - for testing
 
-A scikit-learn TfidfVectorizer was used to get TF-IDF features from the reviews. A sample of 100,000 reviews was used to fit the vectorizer. It considered the top 500 words, removed common English stop words, and included both single words and word pairs. Pandas UDFs were then used to calculate summary features (tfidf_mean, tfidf_max, tfidf_min) for each review. These features were added as separate columns to the dataset.
+TF‑IDF features were generated for the full reviews dataset using a Spark ML pipeline. Each review was tokenized into individual words, and common stopwords (such as 'the' and 'and') were removed because they do not add significant semantic value. The remaining words were first converted into term‑frequency vectors using CountVectorizer, which counts how often each word appears in a review, and then transformed into TF‑IDF representations that give higher weights to words that are frequent in a given review but relatively rare across all reviews in the dataset. This turns the raw text into numerical feature vectors. The resulting TF‑IDF feature DataFrame (tfidf_train) was saved as a Delta table.
 
-- **On Full Data**
+- Additional Feature - (Review Readability feature):
 
-For the full dataset, PySpark ML was used to compute TF-IDF features. Reviews were split into words, converted to term frequencies, and then transformed into TF-IDF vectors. These vectors were stored in a column called tfidf_features and added back to the DataFrame. Spark’s distributed processing made it possible to handle the entire dataset efficiently.
+A readability score was added to the dataset to show how easy each review is to read, using the Flesch Reading Ease formula, which measures text difficulty based on average sentence length and the number of syllables in each word. A Spark function calculates this score for every review, and if a review is empty or cannot be processed, the score is set to 0. This readability score helps describe the writing style of each review and is stored as a new column for later analysis or model training.
 
 - Sentence-Bert:
-- **On Sample Data** - for testing
 
-Sentence-BERT (model name: all-MiniLM-L6-v2)was used  for Semantic Embedding Features because it is fast and efficient. It vectorized the entire review into a 384-dimensional dense embedding capturing rich semantic relationships beyond simple word counts or TF-IDF. Since the dataset was large, Principal Component Analysis (PCA) was applied to reduce the embedding dimensionality (from 384 to 128) for improved computational efficiency and noise reduction. Additionally, the code was run on batches  to handle large-scale data efficiently.
-
-- **On Full Data**
-
-The same Sentence-BERT model was used to the full dataset. Also , here PCA wasn't used to reduce the size of embeddings. However, to handle the large dataset, the reviews were processed in batches using Spark’s Pandas UDF feature, which allowed to efficiently create embeddings without running out of memory.
-
+Semantic embeddings were created for the full dataset to capture the meaning of each review. This was done using the SentenceTransformer model (all-MiniLM-L6-v2), which converts text into dense numerical vectors that represent the semantic relationships between words and sentences. A Spark UDF was applied to generate an embedding for each review. Empty or invalid text entries were skipped for safety, even though the text had already been cleaned earlier. These embeddings help identify how similar or different reviews are in terms of meaning, allowing models to understand context more effectively. The resulting semantic embedding DataFrame (embedded_train) was saved as a Delta table.
 4. Combined Feature Set and Output
 
 After extracting new features, basic text features such as review_length_words and review_length_chars, sentiment score features like (sentiment_pos, sentiment_neg, sentiment_neu, sentiment_compound), and semantic embeddings from Sentence-BERT (sbert_features) and TF-IDF vectors (tfidf_features) were merged with metadata columns (review_id, book_id, rating) to create a complete feature matrix. The final dataset was saved to the Gold layer in a new folder named features_v3 as a Delta table using overwrite mode, ensuring no schema conflicts and making it ready for downstream predictive modeling.
