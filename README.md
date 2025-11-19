@@ -40,6 +40,10 @@ A readability score was added to the dataset to show how easy each review is to 
 
 Semantic embeddings were created for the full dataset to capture the meaning of each review. This was done using the SentenceTransformer model (all-MiniLM-L6-v2), which converts text into dense numerical vectors that represent the semantic relationships between words and sentences. A Spark UDF was applied to generate an embedding for each review. Empty or invalid text entries were skipped for safety, even though the text had already been cleaned earlier. These embeddings help identify how similar or different reviews are in terms of meaning, allowing models to understand context more effectively. The resulting semantic embedding DataFrame (embedded_train) was saved as a Delta table.
 
+- Additional Feature - (TextBlob Subjectivity Feature):
+
+The subjectivity of each review was calculated using the TextBlob library, which gives a score between 0 (very factual) and 1 (very opinionated). A Spark UDF was used to compute this score for every review, assigning 0.0 if the text was empty or invalid. This feature provides additional information about the tone of each review and was added as a separate column to the dataset.
+
 **4. Combined Feature Set and Output**
 
 All the extracted features, including sentiment scores, TF‑IDF vectors, readability scores, and semantic embeddings from SBERT, were first saved as separate Delta tables. In the final step, these features were consolidated by loading the embedded_train table, which already contained all processed training features. The complete set of features was then saved as a single Delta table called combined_train. This merged dataset was verified and stored in the Gold layer at feature_v2/combined_train, making it ready for modeling.
