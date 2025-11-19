@@ -2,9 +2,9 @@
 
 ### **LAB OVERVIEW**
 
-This project builds a feature-rich dataset from Goodreads book reviews to enable modeling of user ratings. The pipeline extracts text-based features such as sentiment, TF-IDF, and BERT embeddings.
+This project builds a feature-rich dataset from Goodreads book reviews by extracting multiple text-based features, including sentiment scores, TF-IDF vectors, readability scores, and BERT embeddings. These features are prepared to make the dataset ready for modeling.
 
-1.	Data Splitting
+**1.	Data Splitting**
 
 The dataset was divided into training, validation, and test sets to ensure the model is tested fairly and prevents data leaking. To ensure that the findings are consistently repeatable, PySpark's randomSplit() method was used with a fixed random seed.
 
@@ -14,11 +14,11 @@ After splitting is done verification was done by counting the rows to ensure tha
 
 **Reference Code:** See the implementation in **`jupyter_notebook/01_data_splitting.ipynb`**
 
-2.	Preprocessing review_text column
+**2.Preprocessing review_text column**
 
-Before doing more feature extraction, made sure the review_text column is cleaned, so it was converted to lowercase, trimmed the spaces, emojis, URLs, and numbers were removed (placeholders kept), punctuation and extra spaces were removed, and very small reviews were filtered outusing the extract `review_length_chars` coloumn that counts the total number of characters.
+Before doing more feature extraction, made sure the review_text column is cleaned, so it was converted to lowercase, trimmed the spaces, emojis, URLs, and numbers were removed (placeholders kept), punctuation and extra spaces were removed, and very small reviews were filtered out using the extract `review_length_chars` column that counts the total number of characters.
 
-3. Feature Extraction
+**3. Feature Extraction**
 
 - Basic Text Features:
 
@@ -30,7 +30,7 @@ The VADER library was used to extract sentiment scores from the review text for 
 
 - TF-IDF:
 
-TF‑IDF features were generated for the full reviews dataset using a Spark ML pipeline. Each review was tokenized into individual words, and common stopwords (such as 'the' and 'and') were removed because they do not add significant semantic value. The remaining words were first converted into term‑frequency vectors using CountVectorizer, which counts how often each word appears in a review, and then transformed into TF‑IDF representations that give higher weights to words that are frequent in a given review but relatively rare across all reviews in the dataset. This turns the raw text into numerical feature vectors. The resulting TF‑IDF feature DataFrame (tfidf_train) was saved as a Delta table.
+TF‑IDF features were generated for the full reviews dataset using a Spark ML pipeline. Each review was tokenized into individual words, and common stopwords (such as "the" and "and") were removed because they do not add significant semantic value. The remaining words were first converted into term‑frequency vectors using CountVectorizer, which counts how often each word appears in a review, and then transformed into TF‑IDF representations. This gives low scores to words that are common across all reviews and high scores to words that are frequent in a specific review but rare across all reviews, helping to highlight the most important words in each review. These features help models focus on meaningful content in the reviews. The resulting TF‑IDF feature DataFrame (tfidf_train) was saved as a Delta table.
 
 - Additional Feature - (Review Readability feature):
 
@@ -40,7 +40,7 @@ A readability score was added to the dataset to show how easy each review is to 
 
 Semantic embeddings were created for the full dataset to capture the meaning of each review. This was done using the SentenceTransformer model (all-MiniLM-L6-v2), which converts text into dense numerical vectors that represent the semantic relationships between words and sentences. A Spark UDF was applied to generate an embedding for each review. Empty or invalid text entries were skipped for safety, even though the text had already been cleaned earlier. These embeddings help identify how similar or different reviews are in terms of meaning, allowing models to understand context more effectively. The resulting semantic embedding DataFrame (embedded_train) was saved as a Delta table.
 
-4. Combined Feature Set and Output
+**4. Combined Feature Set and Output**
 
 All the extracted features, including sentiment scores, TF‑IDF vectors, readability scores, and semantic embeddings from SBERT, were first saved as separate Delta tables. In the final step, these features were consolidated by loading the embedded_train table, which already contained all processed training features. The complete set of features was then saved as a single Delta table called combined_train. This merged dataset was verified and stored in the Gold layer at feature_v2/combined_train, making it ready for modeling.
 
