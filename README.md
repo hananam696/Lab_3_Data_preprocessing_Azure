@@ -1,5 +1,7 @@
 # Lab_3_Data_preprocessing_Azure
 
+### **The main branch and feature-extraction branch are part of one project** 
+
 This lab demonstrates a **practical application of the Medallion Architecture**, showing how raw data is transformed through the Bronze, Silver, and Gold layers:
 - Bronze Layer: Raw JSON data ingested from public sources and stored in the raw folder.
 - Silver Layer: Data Factory converted JSON to Parquet, then Databricks cleaned and validated each dataset.
