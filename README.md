@@ -1,3 +1,4 @@
+### This is a different project - with different dataset
 # Lab 2 – Climate Data ETL and Analysis
 
 **Lab Overview**
@@ -30,3 +31,4 @@ The lab also covers a simple ETL process to prepare the climate data for analysi
 
 **Notebook**
 - The full implementation is available in this branch: 01_lab2.ipynb
+
